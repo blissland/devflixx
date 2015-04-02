@@ -1,7 +1,7 @@
-<subtitles>
+<episubs>
   <div class="row break-long-word">
     <span class="col-xs-12 item-list-title">
-      <span>Movie Subtitles</span>
+      <span>TV Series Subtitles</span>
     </span>
   </div>
   <hr />
@@ -9,16 +9,24 @@
     <div class="row">
       <div class="col-md-8 col-sm-9 col-xs-12">
         <div class="form-group">
-          <label>Title:</label>
-          <input type="text" class="form-control" name="f_title" required autofocus>
+          <label>Series:</label>
+          <input type="text" class="form-control" name="f_series" required autofocus>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col-md-2 col-sm-4 col-xs-4">
         <div class="form-group">
-          <label>Year:</label>
-          <input type="text" class="form-control" name="f_year">
+          <label>Season:</label>
+          <input type="text" class="form-control" name="f_season" required>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2 col-sm-4 col-xs-4">
+        <div class="form-group">
+          <label>Episode:</label>
+          <input type="text" class="form-control" name="f_episode" required>
         </div>
       </div>
     </div>
@@ -65,11 +73,16 @@
     ]
 
     this.on('mount', function() {
-      riot.route.exec(function(page, url, title, lang, year) {
+      riot.route.exec(function(page, url, series, lang, season, episode) {
         self.url = decodeURIComponent(url)
-        if (title) self.f_title.value = decodeURIComponent(title)
-        if (year) self.f_year.value = decodeURIComponent(year)
+        self.f_series.value = decodeURIComponent(series)
         self.lang = decodeURIComponent(lang)
+        if (season && season != 'undefined') {
+          self.f_season.value = decodeURIComponent(season)
+        }
+        if (episode && episode != 'undefined') {
+          self.f_episode.value = decodeURIComponent(episode)
+        }
         self.update()
       })
     })
@@ -78,15 +91,22 @@
       window.history.back()
     }
 
+    _pad(num) {
+      var s = "0" + num;
+      return s.substr(s.length-2);
+    }
+
     play() {
-      title = self.f_title.value
-      year = self.f_year.value
+      series = self.f_series.value
+      season = self.f_season.value
+      episode = self.f_episode.value
       lang = self.f_lang.value
-      subs = {'title':title, 'year':year, 'lang':lang}
-      playerStore.playMovieSubs(self.url, title, subs, function(err) {
+      subs = {'series':series, 'season':season, 'episode':episode, 'lang':lang}
+      title = series + " S" + self._pad(season) + "E" + self._pad(episode)
+      playerStore.playWithSubs(self.url, title, subs, function(err) {
         if (err) return Utils.showError(err)
         window.history.back()
       })
     }
   </script>
-</subtitles>
+</episubs>
